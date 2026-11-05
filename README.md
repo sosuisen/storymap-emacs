@@ -8,8 +8,19 @@ Both use the Rust crate [storymap](https://crates.io/crates/storymap) to draw th
 
 ## Requirements
 
+### Tested environment
+
+- Windows 11
+- Emacs 31.1, as a graphical frame with PNG support
+- Rust 1.99, to build the render program
+
+### Expected requirements
+
+These are estimates from the code. They have not been tested.
+
+- Windows, macOS, or Linux
 - Emacs 29.1 or later, as a graphical frame with PNG support
-- Rust, to build the render program
+- Rust 1.89 or later, only to build
 
 ## Install
 
