@@ -8,8 +8,9 @@ VS Code拡張機能[Story Mapping](https://github.com/sosuisen/vscode-user-story
 
 ## 動作環境
 
-- Emacs 29.1以降のグラフィカルなフレーム（PNG対応）
-- Rust（描画プログラムのビルドに使います）
+- Windows 11
+- Emacs 31.1（グラフィカルなフレーム、PNG対応）
+- Rust 1.99（描画プログラムのビルドに使います）
 
 ## インストール
 

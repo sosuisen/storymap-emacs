@@ -8,8 +8,9 @@ Both use the Rust crate [storymap](https://crates.io/crates/storymap) to draw th
 
 ## Requirements
 
-- Emacs 29.1 or later, as a graphical frame with PNG support
-- Rust, to build the render program
+- Windows 11
+- Emacs 31.1, as a graphical frame with PNG support
+- Rust 1.99, to build the render program
 
 ## Install
 
