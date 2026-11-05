@@ -30,8 +30,9 @@ Build the render program:
 cargo build --release
 ```
 
-The package finds the program in `target/release` next to `story-mapping.el`.
-You can also put it on your `PATH` with `cargo install --path .`.
+The package looks for the program in `target/release` next to `story-mapping.el`. You need no more setup.
+
+To keep `story-mapping.el` in another place, install the program with `cargo install --path .`. It goes into the Cargo bin folder, which is usually `~/.cargo/bin`. Emacs can then find it from anywhere.
 
 Add the package to your init file:
 
