@@ -1,0 +1,18 @@
+[package]
+name = "story-mapping-render"
+version = "0.1.0"
+edition = "2024"
+description = "Render a Markdown outline as a user story map image for the Emacs package story-mapping"
+license = "MIT"
+publish = false
+
+[dependencies]
+storymap = { version = "0.3.0", default-features = false, features = ["image"] }
+
+[profile.dev]
+debug = "line-tables-only"
+
+# The text is measured many times, so unoptimized dependencies make the tests slow
+[profile.dev.package."*"]
+opt-level = 2
+debug = false
