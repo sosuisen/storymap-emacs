@@ -30,8 +30,9 @@ VS Code拡張機能[Story Mapping](https://github.com/sosuisen/vscode-user-story
 cargo build --release
 ```
 
-パッケージは、`story-mapping.el`の隣の`target/release`からプログラムを探します。
-`cargo install --path .`で`PATH`に置くこともできます。
+パッケージは、`story-mapping.el`の隣の`target/release`からプログラムを探すので、追加の設定は要りません。
+
+`story-mapping.el`だけを別の場所に置くときは、`cargo install --path .`でプログラムをインストールしてください。Cargoのbinフォルダ（通常は`~/.cargo/bin`）に入り、どこからでも見つかるようになります。
 
 初期化ファイルに次を追加します。
 
