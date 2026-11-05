@@ -1,0 +1,7 @@
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"
+
+# `cargo cov` shows the test coverage per file. The report is read for the lines that no test
+# reaches. The numbers are not a target.
+[alias]
+cov = ["llvm-cov", "--all-targets"]
