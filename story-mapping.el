@@ -18,7 +18,8 @@
 ;;
 ;; The Rust program `story-mapping-render' draws the map.  Build it with
 ;; `cargo build --release' in the directory of this file, or install it
-;; with `cargo install --path .'.
+;; with `cargo install --path .'.  The script install.sh builds it and
+;; copies it and this file into ~/.emacs.d/bin and ~/.emacs.d/lisp.
 
 ;;; Code:
 

@@ -42,6 +42,23 @@ cargo build --release
 (autoload 'story-mapping-export-svg "story-mapping" nil t)
 ```
 
+### ~/.emacs.dにインストールする
+
+`install.sh`は、プログラムをビルドしてから、`story-mapping.el`を`~/.emacs.d/lisp`に、プログラムを`~/.emacs.d/bin`にコピーします。macOS、Linux、WindowsのGit Bashで動きます。別のディレクトリに入れるときは、`EMACS_DIR`を設定してください。
+
+```sh
+./install.sh
+```
+
+初期化ファイルに、2つのフォルダを追加します。
+
+```elisp
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(add-to-list 'exec-path (expand-file-name "bin" user-emacs-directory))
+(autoload 'story-mapping "story-mapping" nil t)
+(autoload 'story-mapping-export-svg "story-mapping" nil t)
+```
+
 ## 使い方
 
 `.md`ファイルを開いて、次のコマンドを実行します。

@@ -42,6 +42,23 @@ Add the package to your init file:
 (autoload 'story-mapping-export-svg "story-mapping" nil t)
 ```
 
+### Install into ~/.emacs.d
+
+`install.sh` builds the program. Then it copies `story-mapping.el` into `~/.emacs.d/lisp` and the program into `~/.emacs.d/bin`. It runs on macOS, Linux, and Git Bash on Windows. Set `EMACS_DIR` to use another directory.
+
+```sh
+./install.sh
+```
+
+Add both folders to your init file:
+
+```elisp
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(add-to-list 'exec-path (expand-file-name "bin" user-emacs-directory))
+(autoload 'story-mapping "story-mapping" nil t)
+(autoload 'story-mapping-export-svg "story-mapping" nil t)
+```
+
 ## Usage
 
 Open a `.md` file, and run one of these commands.
