@@ -42,6 +42,11 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
   (with-current-buffer story-mapping--preview
     (plist-get (cdr (get-text-property (point-min) 'display)) :data)))
 
+(defun story-mapping-tests--display-scale ()
+  "Return the factor that Emacs scales the image of the current preview by."
+  (with-current-buffer story-mapping--preview
+    (plist-get (cdr (get-text-property (point-min) 'display)) :scale)))
+
 (defun story-mapping-tests--png-width (png)
   "Return the width of the image data PNG."
   (cl-reduce (lambda (width byte) (+ (* width 256) byte))
@@ -202,7 +207,7 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
 ;;; Zoom
 
 (ert-deftest story-mapping-zoom-changes-the-image-and-the-mode-line ()
-  "ズームすると、画像の大きさとモードラインの倍率が変わる。"
+  "ズームすると、モードラインの倍率が変わり、待ち時間のあと新しい倍率で描いた画像を等倍で表示する。"
   (story-mapping-tests--with-source (dir "map.md" "- A\n")
     (story-mapping)
     (story-mapping-tests--wait)
@@ -213,7 +218,57 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
       (story-mapping-tests--wait)
       (should (<= (abs (- (story-mapping-tests--png-width (story-mapping-tests--image))
                           (* 2 width)))
-                  1)))))
+                  1))
+      (should (= (story-mapping-tests--display-scale) 1)))))
+
+(ert-deftest story-mapping-zoom-shows-the-current-image-at-once ()
+  "ズームすると、描画を待たずに、今の画像が新しい倍率で表示される。"
+  (story-mapping-tests--with-source (dir "map.md" "- A\n")
+    (story-mapping)
+    (story-mapping-tests--wait)
+    (let ((image (story-mapping-tests--image)))
+      (with-current-buffer story-mapping--preview
+        (story-mapping--apply-zoom 150))
+      (should (equal (story-mapping-tests--image) image))
+      (should (= (story-mapping-tests--display-scale) 1.5))
+      (story-mapping-tests--wait))))
+
+(ert-deftest story-mapping-zoom-renders-once-after-key-presses-in-a-row ()
+  "続けてズームしても、描画は1回にまとまり、最後の倍率で描かれる。"
+  (story-mapping-tests--with-source (dir "map.md" "- A\n")
+    (story-mapping)
+    (story-mapping-tests--wait)
+    (let ((width (story-mapping-tests--png-width (story-mapping-tests--image)))
+          (renders 0))
+      (cl-letf* ((start (symbol-function 'story-mapping--start-process))
+                 ((symbol-function 'story-mapping--start-process)
+                  (lambda (source)
+                    (setq renders (1+ renders))
+                    (funcall start source))))
+        (with-current-buffer story-mapping--preview
+          (story-mapping-zoom-in)
+          (story-mapping-zoom-in)
+          (story-mapping-zoom-in))
+        (story-mapping-tests--wait))
+      (should (= renders 1))
+      (should (<= (abs (- (story-mapping-tests--png-width (story-mapping-tests--image))
+                          (* 1.3 width)))
+                  2)))))
+
+(ert-deftest story-mapping-zoom-during-render-scales-the-older-image ()
+  "描画中にズームすると、その描画の画像は、新しい倍率に合わせて拡大して表示される。"
+  (story-mapping-tests--with-source (dir "map.md" "- A\n")
+    (story-mapping)
+    (should (process-live-p story-mapping--process))
+    (with-current-buffer story-mapping--preview
+      (story-mapping--apply-zoom 150))
+    ;; Only the render that was running, not the one after the pause
+    (cancel-timer story-mapping--timer)
+    (setq story-mapping--timer nil)
+    (story-mapping-tests--wait)
+    (should (equal (story-mapping-tests--image)
+                   (story-mapping-tests--direct-png "- A\n")))
+    (should (= (story-mapping-tests--display-scale) 1.5))))
 
 (ert-deftest story-mapping-zoom-stays-between-the-limits ()
   "ズームは20%から200%の範囲に収まり、リセットで100%に戻る。"
