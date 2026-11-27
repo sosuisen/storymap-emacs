@@ -74,6 +74,8 @@ Use a larger value on a high resolution display."
 ;; The state of a preview buffer
 (defvar-local story-mapping--source nil "The source buffer of this preview buffer.")
 (defvar-local story-mapping--zoom 100 "The zoom level of this preview in percent.")
+(defvar-local story-mapping--image-zoom nil
+  "The zoom level in percent that the shown image was rendered at.")
 
 ;;; Finding the input and the program
 
@@ -126,7 +128,18 @@ Use a larger value on a high resolution display."
       (put-text-property (point-min) (point-max) 'display
                          ;; `:scale 1' keeps the pixels sharp.  By default, Emacs
                          ;; may enlarge an image to match the size of the font.
-                         (create-image png 'png t :scale 1)))))
+                         (create-image png 'png t :scale 1))
+      (setq story-mapping--image-zoom story-mapping--zoom))))
+
+(defun story-mapping--scale-image ()
+  "Show the image of the current preview at its zoom level, without rendering."
+  (when story-mapping--image-zoom
+    (let ((image (get-text-property (point-min) 'display)))
+      (with-silent-modifications
+        (put-text-property (point-min) (point-max) 'display
+                           (create-image (plist-get (cdr image) :data) 'png t
+                                         :scale (/ story-mapping--zoom
+                                                   (float story-mapping--image-zoom))))))))
 
 (defun story-mapping--finish-render (source process)
   "Handle the end of the render PROCESS of the buffer SOURCE."
@@ -254,6 +267,7 @@ The process waits for the outline on its standard input."
   (force-mode-line-update)
   ;; The end of the mode line is often cut off in a narrow panel
   (message "Zoom: %d%%" story-mapping--zoom)
+  (story-mapping--scale-image)
   (story-mapping--render story-mapping--source))
 
 (defun story-mapping-zoom-in ()
