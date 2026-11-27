@@ -109,12 +109,9 @@ Use a larger value on a high resolution display."
 
 ;;; Rendering the preview
 
-(defun story-mapping--png-arguments (preview)
-  "Return the program arguments for the image of the buffer PREVIEW."
-  (list "png"
-        (number-to-string
-         (* story-mapping-scale
-            (/ (buffer-local-value 'story-mapping--zoom preview) 100.0)))))
+(defun story-mapping--png-arguments (zoom)
+  "Return the program arguments for the image at the ZOOM level in percent."
+  (list "png" (number-to-string (* story-mapping-scale (/ zoom 100.0)))))
 
 (defun story-mapping--put-image (png)
   "Show the image data PNG in the current preview at its zoom level."
@@ -129,13 +126,14 @@ Use a larger value on a high resolution display."
                                      :scale (/ story-mapping--zoom
                                                (float story-mapping--image-zoom))))))
 
-(defun story-mapping--show-image (preview png)
-  "Show the image data PNG in the buffer PREVIEW."
+(defun story-mapping--show-image (preview png zoom)
+  "Show the image data PNG, rendered at the ZOOM level, in the buffer PREVIEW."
   (with-current-buffer preview
     (when (= (point-min) (point-max))
       (with-silent-modifications (insert " "))
       (goto-char (point-min)))
-    (setq story-mapping--image-zoom story-mapping--zoom)
+    ;; The zoom level may have changed during the render
+    (setq story-mapping--image-zoom zoom)
     (story-mapping--put-image png)))
 
 (defun story-mapping--scale-image ()
@@ -155,7 +153,8 @@ Use a larger value on a high resolution display."
               (setq story-mapping--process nil)
               (let ((data (with-current-buffer output (buffer-string))))
                 (if (zerop (process-exit-status process))
-                    (story-mapping--show-image story-mapping--preview data)
+                    (story-mapping--show-image story-mapping--preview data
+                                               (process-get process 'zoom))
                   ;; Keep the last good image, so that the map does not flicker
                   (message "story-mapping: %s"
                            (string-trim (decode-coding-string data 'utf-8)))))
@@ -166,26 +165,29 @@ Use a larger value on a high resolution display."
 (defun story-mapping--start-process (source)
   "Start a process that renders the buffer SOURCE, and return it.
 The process waits for the outline on its standard input."
-  (let ((program (story-mapping--program))
-        (arguments (story-mapping--png-arguments
-                    (buffer-local-value 'story-mapping--preview source)))
-        (output (generate-new-buffer " *story-mapping-output*" t))
-        ;; Not the directory of the file.  It may be on a remote host, and on
-        ;; Windows a running program blocks the deletion of its directory.
-        (default-directory story-mapping--directory))
+  (let* ((program (story-mapping--program))
+         (zoom (buffer-local-value 'story-mapping--zoom
+                                   (buffer-local-value 'story-mapping--preview source)))
+         (output (generate-new-buffer " *story-mapping-output*" t))
+         ;; Not the directory of the file.  It may be on a remote host, and on
+         ;; Windows a running program blocks the deletion of its directory.
+         (default-directory story-mapping--directory))
     (with-current-buffer output (set-buffer-multibyte nil))
     ;; Standard error goes to the same buffer.  The program writes there only
     ;; when it fails, and then it writes no image.
-    (make-process
-     :name "story-mapping-render"
-     :buffer output
-     :command (cons program arguments)
-     :connection-type 'pipe
-     :coding '(binary . utf-8-unix)
-     :noquery t
-     :sentinel (lambda (process _event)
-                 (unless (process-live-p process)
-                   (story-mapping--finish-render source process))))))
+    (let ((process
+           (make-process
+            :name "story-mapping-render"
+            :buffer output
+            :command (cons program (story-mapping--png-arguments zoom))
+            :connection-type 'pipe
+            :coding '(binary . utf-8-unix)
+            :noquery t
+            :sentinel (lambda (process _event)
+                        (unless (process-live-p process)
+                          (story-mapping--finish-render source process))))))
+      (process-put process 'zoom zoom)
+      process)))
 
 (defun story-mapping--render (source)
   "Render the buffer SOURCE, or again after the render that is running."
