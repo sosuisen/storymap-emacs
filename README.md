@@ -76,6 +76,7 @@ Use these keys in the panel.
 | `-` | Zooms out |
 | `0` | Sets the zoom to 100% |
 | Arrow keys, `C-n`, `C-p`, `C-f`, `C-b`, `C-v`, `M-v`, the mouse wheel | Scroll the map |
+| `C-` and an arrow key | Scrolls the map 10 times as far as the arrow key alone |
 | `g` | Draws the map again |
 | `q` | Closes the panel |
 
@@ -92,6 +93,7 @@ Use `M-x customize-group RET story-mapping` to change them.
 | `story-mapping-window-width` | `0.5` | The width of the panel, as a fraction of the frame |
 | `story-mapping-update-delay` | `0.3` | The seconds to wait after an edit before the update |
 | `story-mapping-scale` | `1.0` | The image pixels per map pixel at 100%. Use `2.0` if the map looks small on a high resolution display |
+| `story-mapping-fast-scroll-step` | `10` | The columns or lines that `C-` and an arrow key scroll |
 
 To open the panel in another place, add a rule for `*Story Map: ...*` buffers to `display-buffer-alist`.
 

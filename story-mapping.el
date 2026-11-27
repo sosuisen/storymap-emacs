@@ -51,6 +51,11 @@ this library is also searched."
 Use a larger value on a high resolution display."
   :type 'number)
 
+(defcustom story-mapping-fast-scroll-step 10
+  "How many columns or lines Ctrl and an arrow key scroll the preview.
+An arrow key alone scrolls one."
+  :type 'natnum)
+
 (defconst story-mapping--directory
   (file-name-directory (or load-file-name buffer-file-name))
   "The directory of this library.")
@@ -293,6 +298,26 @@ The process waits for the outline on its standard input."
   (interactive nil story-mapping-preview-mode)
   (story-mapping--apply-zoom 100))
 
+(defun story-mapping-scroll-right-fast ()
+  "Scroll the map to the right, `story-mapping-fast-scroll-step' columns."
+  (interactive nil story-mapping-preview-mode)
+  (image-forward-hscroll story-mapping-fast-scroll-step))
+
+(defun story-mapping-scroll-left-fast ()
+  "Scroll the map to the left, `story-mapping-fast-scroll-step' columns."
+  (interactive nil story-mapping-preview-mode)
+  (image-backward-hscroll story-mapping-fast-scroll-step))
+
+(defun story-mapping-scroll-down-fast ()
+  "Scroll the map down, `story-mapping-fast-scroll-step' lines."
+  (interactive nil story-mapping-preview-mode)
+  (image-next-line story-mapping-fast-scroll-step))
+
+(defun story-mapping-scroll-up-fast ()
+  "Scroll the map up, `story-mapping-fast-scroll-step' lines."
+  (interactive nil story-mapping-preview-mode)
+  (image-previous-line story-mapping-fast-scroll-step))
+
 (defun story-mapping-quit ()
   "Close the preview and stop following the edits."
   (interactive nil story-mapping-preview-mode)
@@ -310,6 +335,10 @@ The process waits for the outline on its standard input."
   "q" #'story-mapping-quit
   ;; A map is one large image on one line.  The ordinary movement commands
   ;; cannot scroll inside it, so use the commands of `image-mode'.
+  "C-<right>" #'story-mapping-scroll-right-fast
+  "C-<left>" #'story-mapping-scroll-left-fast
+  "C-<down>" #'story-mapping-scroll-down-fast
+  "C-<up>" #'story-mapping-scroll-up-fast
   "<remap> <forward-char>" #'image-forward-hscroll
   "<remap> <right-char>" #'image-forward-hscroll
   "<remap> <backward-char>" #'image-backward-hscroll
@@ -348,7 +377,8 @@ The process waits for the outline on its standard input."
 The map follows the edits of the buffer, also before they are saved.
 
 In the panel, + and - change the zoom level, 0 resets it, q closes the
-panel, and the arrow keys scroll the map."
+panel, and the arrow keys scroll the map.  Ctrl and an arrow key
+scroll further."
   (interactive)
   (let ((source (story-mapping--source-buffer)))
     (story-mapping--check-markdown-file source)

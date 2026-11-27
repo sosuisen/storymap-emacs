@@ -287,6 +287,47 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
         (should (= story-mapping--zoom 100))
         (with-current-buffer source (story-mapping-tests--wait))))))
 
+;;; Scrolling
+
+(defun story-mapping-tests--scroll-calls (key)
+  "Press KEY in a preview, and return the calls of the `image-mode' scroll commands.
+Each call is (COMMAND ARGUMENT).  In batch mode an image cannot scroll, so
+the commands only record their calls."
+  (let ((calls nil))
+    (cl-letf (((symbol-function 'image-forward-hscroll)
+               (lambda (&optional n) (push (list 'image-forward-hscroll n) calls)))
+              ((symbol-function 'image-backward-hscroll)
+               (lambda (&optional n) (push (list 'image-backward-hscroll n) calls)))
+              ((symbol-function 'image-next-line)
+               (lambda (n) (push (list 'image-next-line n) calls)))
+              ((symbol-function 'image-previous-line)
+               (lambda (n) (push (list 'image-previous-line n) calls))))
+      (with-temp-buffer
+        (story-mapping-preview-mode)
+        (call-interactively (key-binding (kbd key)))))
+    (nreverse calls)))
+
+(ert-deftest story-mapping-ctrl-arrows-scroll-ten-columns-sideways ()
+  "Ctrlと左右の矢印は、矢印の10倍の幅で横に動かす。"
+  (should (equal (story-mapping-tests--scroll-calls "C-<right>")
+                 '((image-forward-hscroll 10))))
+  (should (equal (story-mapping-tests--scroll-calls "C-<left>")
+                 '((image-backward-hscroll 10)))))
+
+(ert-deftest story-mapping-ctrl-arrows-scroll-ten-lines-up-and-down ()
+  "Ctrlと上下の矢印は、矢印の10倍の幅で縦に動かす。"
+  (should (equal (story-mapping-tests--scroll-calls "C-<down>")
+                 '((image-next-line 10))))
+  (should (equal (story-mapping-tests--scroll-calls "C-<up>")
+                 '((image-previous-line 10)))))
+
+(ert-deftest story-mapping-ctrl-arrow-step-can-be-changed ()
+  "Ctrlと矢印で動く幅は、`story-mapping-fast-scroll-step'で変えられる。"
+  (let ((story-mapping-fast-scroll-step 3))
+    (should (equal (mapcar (lambda (key) (cadar (story-mapping-tests--scroll-calls key)))
+                           '("C-<right>" "C-<left>" "C-<down>" "C-<up>"))
+                   '(3 3 3 3)))))
+
 ;;; Closing
 
 (ert-deftest story-mapping-quit-closes-the-panel-and-stops-following ()
