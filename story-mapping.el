@@ -271,7 +271,10 @@ The process waits for the outline on its standard input."
   ;; The end of the mode line is often cut off in a narrow panel
   (message "Zoom: %d%%" story-mapping--zoom)
   (story-mapping--scale-image)
-  (story-mapping--render story-mapping--source))
+  ;; Render after a pause, like after an edit, so that key presses in a row
+  ;; start only one render
+  (with-current-buffer story-mapping--source
+    (story-mapping--schedule-update)))
 
 (defun story-mapping-zoom-in ()
   "Make the map in the preview larger."
