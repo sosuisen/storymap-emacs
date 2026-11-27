@@ -51,6 +51,11 @@ this library is also searched."
 Use a larger value on a high resolution display."
   :type 'number)
 
+(defcustom story-mapping-fast-scroll-step 10
+  "How many columns or lines Ctrl and an arrow key scroll the preview.
+An arrow key alone scrolls one."
+  :type 'natnum)
+
 (defconst story-mapping--directory
   (file-name-directory (or load-file-name buffer-file-name))
   "The directory of this library.")
@@ -294,24 +299,24 @@ The process waits for the outline on its standard input."
   (story-mapping--apply-zoom 100))
 
 (defun story-mapping-scroll-right-fast ()
-  "Scroll the map to the right, ten columns."
+  "Scroll the map to the right, `story-mapping-fast-scroll-step' columns."
   (interactive nil story-mapping-preview-mode)
-  (image-forward-hscroll 10))
+  (image-forward-hscroll story-mapping-fast-scroll-step))
 
 (defun story-mapping-scroll-left-fast ()
-  "Scroll the map to the left, ten columns."
+  "Scroll the map to the left, `story-mapping-fast-scroll-step' columns."
   (interactive nil story-mapping-preview-mode)
-  (image-backward-hscroll 10))
+  (image-backward-hscroll story-mapping-fast-scroll-step))
 
 (defun story-mapping-scroll-down-fast ()
-  "Scroll the map down, ten lines."
+  "Scroll the map down, `story-mapping-fast-scroll-step' lines."
   (interactive nil story-mapping-preview-mode)
-  (image-next-line 10))
+  (image-next-line story-mapping-fast-scroll-step))
 
 (defun story-mapping-scroll-up-fast ()
-  "Scroll the map up, ten lines."
+  "Scroll the map up, `story-mapping-fast-scroll-step' lines."
   (interactive nil story-mapping-preview-mode)
-  (image-previous-line 10))
+  (image-previous-line story-mapping-fast-scroll-step))
 
 (defun story-mapping-quit ()
   "Close the preview and stop following the edits."
