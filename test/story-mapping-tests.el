@@ -321,6 +321,13 @@ the commands only record their calls."
   (should (equal (story-mapping-tests--scroll-calls "C-<up>")
                  '((image-previous-line 10)))))
 
+(ert-deftest story-mapping-ctrl-arrow-step-can-be-changed ()
+  "Ctrlと矢印で動く幅は、`story-mapping-fast-scroll-step'で変えられる。"
+  (let ((story-mapping-fast-scroll-step 3))
+    (should (equal (mapcar (lambda (key) (cadar (story-mapping-tests--scroll-calls key)))
+                           '("C-<right>" "C-<left>" "C-<down>" "C-<up>"))
+                   '(3 3 3 3)))))
+
 ;;; Closing
 
 (ert-deftest story-mapping-quit-closes-the-panel-and-stops-following ()
