@@ -297,7 +297,11 @@ the commands only record their calls."
     (cl-letf (((symbol-function 'image-forward-hscroll)
                (lambda (&optional n) (push (list 'image-forward-hscroll n) calls)))
               ((symbol-function 'image-backward-hscroll)
-               (lambda (&optional n) (push (list 'image-backward-hscroll n) calls))))
+               (lambda (&optional n) (push (list 'image-backward-hscroll n) calls)))
+              ((symbol-function 'image-next-line)
+               (lambda (n) (push (list 'image-next-line n) calls)))
+              ((symbol-function 'image-previous-line)
+               (lambda (n) (push (list 'image-previous-line n) calls))))
       (with-temp-buffer
         (story-mapping-preview-mode)
         (call-interactively (key-binding (kbd key)))))
@@ -309,6 +313,13 @@ the commands only record their calls."
                  '((image-forward-hscroll 10))))
   (should (equal (story-mapping-tests--scroll-calls "C-<left>")
                  '((image-backward-hscroll 10)))))
+
+(ert-deftest story-mapping-ctrl-arrows-scroll-ten-lines-up-and-down ()
+  "Ctrlと上下の矢印は、矢印の10倍の幅で縦に動かす。"
+  (should (equal (story-mapping-tests--scroll-calls "C-<down>")
+                 '((image-next-line 10))))
+  (should (equal (story-mapping-tests--scroll-calls "C-<up>")
+                 '((image-previous-line 10)))))
 
 ;;; Closing
 
