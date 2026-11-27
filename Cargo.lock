@@ -571,9 +571,9 @@ dependencies = [
 
 [[package]]
 name = "storymap"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9f8d403924332ceff5c3e3c96d77822755deb23d21df0615041a2f9d6517f3c"
+checksum = "2ddc01e7e91f621a72c0512835e52d2d63d86444fab0053a8f651667cf91591e"
 dependencies = [
  "comrak",
  "regex",

@@ -7,7 +7,7 @@ license = "MIT"
 publish = false
 
 [dependencies]
-storymap = { version = "0.3.0", default-features = false, features = ["image"] }
+storymap = { version = "0.3.1", default-features = false, features = ["image"] }
 
 [profile.dev]
 debug = "line-tables-only"
