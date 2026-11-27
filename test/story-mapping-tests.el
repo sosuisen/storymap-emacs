@@ -42,6 +42,11 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
   (with-current-buffer story-mapping--preview
     (plist-get (cdr (get-text-property (point-min) 'display)) :data)))
 
+(defun story-mapping-tests--display-scale ()
+  "Return the factor that Emacs scales the image of the current preview by."
+  (with-current-buffer story-mapping--preview
+    (plist-get (cdr (get-text-property (point-min) 'display)) :scale)))
+
 (defun story-mapping-tests--png-width (png)
   "Return the width of the image data PNG."
   (cl-reduce (lambda (width byte) (+ (* width 256) byte))
@@ -214,6 +219,18 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
       (should (<= (abs (- (story-mapping-tests--png-width (story-mapping-tests--image))
                           (* 2 width)))
                   1)))))
+
+(ert-deftest story-mapping-zoom-shows-the-current-image-at-once ()
+  "ズームすると、描画を待たずに、今の画像が新しい倍率で表示される。"
+  (story-mapping-tests--with-source (dir "map.md" "- A\n")
+    (story-mapping)
+    (story-mapping-tests--wait)
+    (let ((image (story-mapping-tests--image)))
+      (with-current-buffer story-mapping--preview
+        (story-mapping--apply-zoom 150))
+      (should (equal (story-mapping-tests--image) image))
+      (should (= (story-mapping-tests--display-scale) 1.5))
+      (story-mapping-tests--wait))))
 
 (ert-deftest story-mapping-zoom-stays-between-the-limits ()
   "ズームは20%から200%の範囲に収まり、リセットで100%に戻る。"
