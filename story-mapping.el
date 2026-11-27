@@ -116,30 +116,33 @@ Use a larger value on a high resolution display."
          (* story-mapping-scale
             (/ (buffer-local-value 'story-mapping--zoom preview) 100.0)))))
 
+(defun story-mapping--put-image (png)
+  "Show the image data PNG in the current preview at its zoom level."
+  (with-silent-modifications
+    ;; Change only the property of the text.  Replacing the text would move
+    ;; the window to the top of the map at each update.
+    (put-text-property (point-min) (point-max) 'display
+                       ;; An explicit `:scale' also keeps the pixels sharp at
+                       ;; 100%.  By default, Emacs may enlarge an image to match
+                       ;; the size of the font.
+                       (create-image png 'png t
+                                     :scale (/ story-mapping--zoom
+                                               (float story-mapping--image-zoom))))))
+
 (defun story-mapping--show-image (preview png)
   "Show the image data PNG in the buffer PREVIEW."
   (with-current-buffer preview
-    (with-silent-modifications
-      (when (= (point-min) (point-max))
-        (insert " ")
-        (goto-char (point-min)))
-      ;; Change only the property of the text.  Replacing the text would move
-      ;; the window to the top of the map at each update.
-      (put-text-property (point-min) (point-max) 'display
-                         ;; `:scale 1' keeps the pixels sharp.  By default, Emacs
-                         ;; may enlarge an image to match the size of the font.
-                         (create-image png 'png t :scale 1))
-      (setq story-mapping--image-zoom story-mapping--zoom))))
+    (when (= (point-min) (point-max))
+      (with-silent-modifications (insert " "))
+      (goto-char (point-min)))
+    (setq story-mapping--image-zoom story-mapping--zoom)
+    (story-mapping--put-image png)))
 
 (defun story-mapping--scale-image ()
   "Show the image of the current preview at its zoom level, without rendering."
   (when story-mapping--image-zoom
-    (let ((image (get-text-property (point-min) 'display)))
-      (with-silent-modifications
-        (put-text-property (point-min) (point-max) 'display
-                           (create-image (plist-get (cdr image) :data) 'png t
-                                         :scale (/ story-mapping--zoom
-                                                   (float story-mapping--image-zoom))))))))
+    (story-mapping--put-image
+     (plist-get (cdr (get-text-property (point-min) 'display)) :data))))
 
 (defun story-mapping--finish-render (source process)
   "Handle the end of the render PROCESS of the buffer SOURCE."
