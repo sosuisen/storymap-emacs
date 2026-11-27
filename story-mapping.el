@@ -303,6 +303,16 @@ The process waits for the outline on its standard input."
   (interactive nil story-mapping-preview-mode)
   (image-backward-hscroll 10))
 
+(defun story-mapping-scroll-down-fast ()
+  "Scroll the map down, ten lines."
+  (interactive nil story-mapping-preview-mode)
+  (image-next-line 10))
+
+(defun story-mapping-scroll-up-fast ()
+  "Scroll the map up, ten lines."
+  (interactive nil story-mapping-preview-mode)
+  (image-previous-line 10))
+
 (defun story-mapping-quit ()
   "Close the preview and stop following the edits."
   (interactive nil story-mapping-preview-mode)
@@ -322,6 +332,8 @@ The process waits for the outline on its standard input."
   ;; cannot scroll inside it, so use the commands of `image-mode'.
   "C-<right>" #'story-mapping-scroll-right-fast
   "C-<left>" #'story-mapping-scroll-left-fast
+  "C-<down>" #'story-mapping-scroll-down-fast
+  "C-<up>" #'story-mapping-scroll-up-fast
   "<remap> <forward-char>" #'image-forward-hscroll
   "<remap> <right-char>" #'image-forward-hscroll
   "<remap> <backward-char>" #'image-backward-hscroll
