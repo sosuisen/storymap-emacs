@@ -287,6 +287,29 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
         (should (= story-mapping--zoom 100))
         (with-current-buffer source (story-mapping-tests--wait))))))
 
+;;; Scrolling
+
+(defun story-mapping-tests--scroll-calls (key)
+  "Press KEY in a preview, and return the calls of the `image-mode' scroll commands.
+Each call is (COMMAND ARGUMENT).  In batch mode an image cannot scroll, so
+the commands only record their calls."
+  (let ((calls nil))
+    (cl-letf (((symbol-function 'image-forward-hscroll)
+               (lambda (&optional n) (push (list 'image-forward-hscroll n) calls)))
+              ((symbol-function 'image-backward-hscroll)
+               (lambda (&optional n) (push (list 'image-backward-hscroll n) calls))))
+      (with-temp-buffer
+        (story-mapping-preview-mode)
+        (call-interactively (key-binding (kbd key)))))
+    (nreverse calls)))
+
+(ert-deftest story-mapping-ctrl-arrows-scroll-ten-columns-sideways ()
+  "Ctrlと左右の矢印は、矢印の10倍の幅で横に動かす。"
+  (should (equal (story-mapping-tests--scroll-calls "C-<right>")
+                 '((image-forward-hscroll 10))))
+  (should (equal (story-mapping-tests--scroll-calls "C-<left>")
+                 '((image-backward-hscroll 10)))))
+
 ;;; Closing
 
 (ert-deftest story-mapping-quit-closes-the-panel-and-stops-following ()
