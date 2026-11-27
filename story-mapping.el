@@ -377,7 +377,8 @@ The process waits for the outline on its standard input."
 The map follows the edits of the buffer, also before they are saved.
 
 In the panel, + and - change the zoom level, 0 resets it, q closes the
-panel, and the arrow keys scroll the map."
+panel, and the arrow keys scroll the map.  Ctrl and an arrow key
+scroll further."
   (interactive)
   (let ((source (story-mapping--source-buffer)))
     (story-mapping--check-markdown-file source)

@@ -76,6 +76,7 @@ cargo build --release
 | `-` | 縮小 |
 | `0` | 100%に戻す |
 | 矢印キー、`C-n`、`C-p`、`C-f`、`C-b`、`C-v`、`M-v`、マウスホイール | スクロール |
+| `C-`と矢印キー | 矢印キーだけのときの10倍の幅でスクロール |
 | `g` | 描き直す |
 | `q` | パネルを閉じる |
 
@@ -92,6 +93,7 @@ cargo build --release
 | `story-mapping-window-width` | `0.5` | パネルの幅（フレームに対する割合） |
 | `story-mapping-update-delay` | `0.3` | 編集のあと、更新するまでに待つ秒数 |
 | `story-mapping-scale` | `1.0` | 100%のときの、マップの1pxあたりの画像のピクセル数。高解像度の画面でマップが小さく見えるときは`2.0`にします |
+| `story-mapping-fast-scroll-step` | `10` | `C-`と矢印キーでスクロールする文字数や行数 |
 
 パネルを別の場所に開くには、`*Story Map: ...*`のバッファの規則を`display-buffer-alist`に追加します。
 
