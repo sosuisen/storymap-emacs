@@ -232,6 +232,28 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
       (should (= (story-mapping-tests--display-scale) 1.5))
       (story-mapping-tests--wait))))
 
+(ert-deftest story-mapping-zoom-renders-once-after-key-presses-in-a-row ()
+  "続けてズームしても、描画は1回にまとまり、最後の倍率で描かれる。"
+  (story-mapping-tests--with-source (dir "map.md" "- A\n")
+    (story-mapping)
+    (story-mapping-tests--wait)
+    (let ((width (story-mapping-tests--png-width (story-mapping-tests--image)))
+          (renders 0))
+      (cl-letf* ((start (symbol-function 'story-mapping--start-process))
+                 ((symbol-function 'story-mapping--start-process)
+                  (lambda (source)
+                    (setq renders (1+ renders))
+                    (funcall start source))))
+        (with-current-buffer story-mapping--preview
+          (story-mapping-zoom-in)
+          (story-mapping-zoom-in)
+          (story-mapping-zoom-in))
+        (story-mapping-tests--wait))
+      (should (= renders 1))
+      (should (<= (abs (- (story-mapping-tests--png-width (story-mapping-tests--image))
+                          (* 1.3 width)))
+                  2)))))
+
 (ert-deftest story-mapping-zoom-stays-between-the-limits ()
   "ズームは20%から200%の範囲に収まり、リセットで100%に戻る。"
   (story-mapping-tests--with-source (dir "map.md" "- A\n")
