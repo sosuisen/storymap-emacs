@@ -207,7 +207,7 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
 ;;; Zoom
 
 (ert-deftest story-mapping-zoom-changes-the-image-and-the-mode-line ()
-  "ズームすると、画像の大きさとモードラインの倍率が変わる。"
+  "ズームすると、モードラインの倍率が変わり、待ち時間のあと新しい倍率で描いた画像を等倍で表示する。"
   (story-mapping-tests--with-source (dir "map.md" "- A\n")
     (story-mapping)
     (story-mapping-tests--wait)
@@ -218,7 +218,8 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
       (story-mapping-tests--wait)
       (should (<= (abs (- (story-mapping-tests--png-width (story-mapping-tests--image))
                           (* 2 width)))
-                  1)))))
+                  1))
+      (should (= (story-mapping-tests--display-scale) 1)))))
 
 (ert-deftest story-mapping-zoom-shows-the-current-image-at-once ()
   "ズームすると、描画を待たずに、今の画像が新しい倍率で表示される。"
