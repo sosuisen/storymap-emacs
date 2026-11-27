@@ -293,6 +293,16 @@ The process waits for the outline on its standard input."
   (interactive nil story-mapping-preview-mode)
   (story-mapping--apply-zoom 100))
 
+(defun story-mapping-scroll-right-fast ()
+  "Scroll the map to the right, ten columns."
+  (interactive nil story-mapping-preview-mode)
+  (image-forward-hscroll 10))
+
+(defun story-mapping-scroll-left-fast ()
+  "Scroll the map to the left, ten columns."
+  (interactive nil story-mapping-preview-mode)
+  (image-backward-hscroll 10))
+
 (defun story-mapping-quit ()
   "Close the preview and stop following the edits."
   (interactive nil story-mapping-preview-mode)
@@ -310,6 +320,8 @@ The process waits for the outline on its standard input."
   "q" #'story-mapping-quit
   ;; A map is one large image on one line.  The ordinary movement commands
   ;; cannot scroll inside it, so use the commands of `image-mode'.
+  "C-<right>" #'story-mapping-scroll-right-fast
+  "C-<left>" #'story-mapping-scroll-left-fast
   "<remap> <forward-char>" #'image-forward-hscroll
   "<remap> <right-char>" #'image-forward-hscroll
   "<remap> <backward-char>" #'image-backward-hscroll
