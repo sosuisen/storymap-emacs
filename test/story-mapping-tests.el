@@ -254,6 +254,21 @@ file in DIRECTORY-VARIABLE, and the update delay is zero."
                           (* 1.3 width)))
                   2)))))
 
+(ert-deftest story-mapping-zoom-during-render-scales-the-older-image ()
+  "描画中にズームすると、その描画の画像は、新しい倍率に合わせて拡大して表示される。"
+  (story-mapping-tests--with-source (dir "map.md" "- A\n")
+    (story-mapping)
+    (should (process-live-p story-mapping--process))
+    (with-current-buffer story-mapping--preview
+      (story-mapping--apply-zoom 150))
+    ;; Only the render that was running, not the one after the pause
+    (cancel-timer story-mapping--timer)
+    (setq story-mapping--timer nil)
+    (story-mapping-tests--wait)
+    (should (equal (story-mapping-tests--image)
+                   (story-mapping-tests--direct-png "- A\n")))
+    (should (= (story-mapping-tests--display-scale) 1.5))))
+
 (ert-deftest story-mapping-zoom-stays-between-the-limits ()
   "ズームは20%から200%の範囲に収まり、リセットで100%に戻る。"
   (story-mapping-tests--with-source (dir "map.md" "- A\n")
